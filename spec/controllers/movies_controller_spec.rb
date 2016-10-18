@@ -19,6 +19,26 @@ describe MoviesController do
       allow(Movie).to receive(:find_in_tmdb).and_return (fake_results)
       post :search_tmdb, {:search_terms => 'Ted'}
       expect(assigns(:movies)).to eq(fake_results)
-    end 
+    end
+    it 'should return message no movie found in TMDb' do
+        post :search_tmdb, {:search_terms	=> 'abcdefgh'}
+        expect(response).to redirect_to('/movies')
+		    expect(flash[:notice]).to eq "No matching movies were found on TMDb"
+    end
+    it 'should return invalid search term' do
+        post :search_tmdb, {:search_terms	=>	'      '}
+        expect(response).to redirect_to('/movies')
+		    expect(flash[:notice]).to eq "Invalid search term"
+    end
+    it 'should return Movies were successfully added' do
+        post :add_tmdb,	{:checkbox	=>	{"123456" => "1"}}
+        expect(response).to redirect_to('/movies')
+		    expect(flash[:notice]).to eq "Movies successfully added to Rotten Potatoes"
+    end
+    it 'should return No movies selected' do
+        post :add_tmdb,	{:tmdb_movies	=>	nil}
+        expect(response).to redirect_to('/movies')
+		    expect(flash[:notice]).to eq "No movies were selected"
+	  end
   end
 end
